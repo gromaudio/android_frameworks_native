@@ -72,7 +72,7 @@ private:
  * 
  */
 
-FramebufferNativeWindow::FramebufferNativeWindow() 
+FramebufferNativeWindow::FramebufferNativeWindow(const char* sFbDevName)
     : BASE(), fbDev(0), grDev(0), mUpdateOnDemand(false)
 {
     hw_module_t const* module;
@@ -80,7 +80,12 @@ FramebufferNativeWindow::FramebufferNativeWindow()
         int stride;
         int err;
         int i;
-        err = framebuffer_open(module, &fbDev);
+
+        if((sFbDevName[2] >= '0') && (sFbDevName[2] <= '9'))
+            fbDev = (framebuffer_device_t*)(sFbDevName[2] - '0');
+        
+        err = module->methods->open(module, sFbDevName, (struct hw_device_t**)&fbDev);
+
         ALOGE_IF(err, "couldn't open framebuffer HAL (%s)", strerror(-err));
         
         err = gralloc_open(module, &grDev);
@@ -117,14 +122,14 @@ FramebufferNativeWindow::FramebufferNativeWindow()
         for (i = 0; i < mNumBuffers; i++)
         {
                 buffers[i] = new NativeBuffer(
-                        fbDev->width, fbDev->height, fbDev->format, GRALLOC_USAGE_HW_FB);
+                        fbDev->width, fbDev->height, fbDev->format, GRALLOC_USAGE_HW_FB|GRALLOC_USAGE_HW_FBX);
         }
 
         for (i = 0; i < mNumBuffers; i++)
         {
                 err = grDev->alloc(grDev,
                         fbDev->width, fbDev->height, fbDev->format,
-                        GRALLOC_USAGE_HW_FB, &buffers[i]->handle, &buffers[i]->stride);
+                        GRALLOC_USAGE_HW_FB|GRALLOC_USAGE_HW_FBX, &buffers[i]->handle, &buffers[i]->stride);
 
                 ALOGE_IF(err, "fb buffer %d allocation failed w=%d, h=%d, err=%s",
                         i, fbDev->width, fbDev->height, strerror(-err));
@@ -362,7 +367,20 @@ using namespace android;
 EGLNativeWindowType android_createDisplaySurface(void)
 {
     FramebufferNativeWindow* w;
-    w = new FramebufferNativeWindow();
+    w = new FramebufferNativeWindow("fb0");
+    if (w->getDevice() == NULL) {
+        // get a ref so it can be destroyed when we exit this block
+        sp<FramebufferNativeWindow> ref(w);
+        return NULL;
+    }
+    return (EGLNativeWindowType)w;
+}
+
+
+EGLNativeWindowType android_createDisplaySurfaceEx(const char* sFbDevName)
+{
+    FramebufferNativeWindow* w;
+    w = new FramebufferNativeWindow(sFbDevName);
     if (w->getDevice() == NULL) {
         // get a ref so it can be destroyed when we exit this block
         sp<FramebufferNativeWindow> ref(w);
