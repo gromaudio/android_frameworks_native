@@ -6,5 +6,5 @@ LOCAL_SRC_FILES:= app-linux.cpp demo.c.arm
 LOCAL_SHARED_LIBRARIES := libEGL libGLESv1_CM libui
 LOCAL_C_INCLUDES += $(call include-path-for, opengl-tests-includes)
 LOCAL_MODULE:= angeles
-LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_TAGS := eng
 include $(BUILD_EXECUTABLE)

@@ -184,7 +184,7 @@ const int yuvTexWidth = 608;
 const int yuvTexHeight = 480;
 const int yuvTexUsage = GraphicBuffer::USAGE_HW_TEXTURE |
         GraphicBuffer::USAGE_SW_WRITE_RARELY;
-const int yuvTexFormat = HAL_PIXEL_FORMAT_YV12;
+const int yuvTexFormat = HAL_PIXEL_FORMAT_RGBA_8888;
 const int yuvTexOffsetY = 0;
 const bool yuvTexSameUV = false;
 static sp<GraphicBuffer> yuvTexBuffer;

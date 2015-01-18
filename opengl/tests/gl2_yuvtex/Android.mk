@@ -15,7 +15,7 @@ LOCAL_C_INCLUDES += $(call include-path-for, opengl-tests-includes)
 
 LOCAL_MODULE:= test-opengl-gl2_yuvtex
 
-LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_TAGS := eng
 
 LOCAL_CFLAGS := -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES
 
